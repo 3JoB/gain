@@ -1,23 +1,23 @@
 package gain
 
 import (
-	"syscall"
+	"golang.org/x/sys/unix"
 )
 
 type buffer struct {
 	data   []byte
-	iovecs []syscall.Iovec
+	iovecs []unix.Iovec
 }
 
 func createBuffer(bufferSize uint) *buffer {
 	bufferMem := make([]byte, bufferSize)
-	iovec := syscall.Iovec{
+	iovec := unix.Iovec{
 		Base: &bufferMem[0],
 		Len:  uint64(bufferSize),
 	}
 	buff := &buffer{
 		data:   bufferMem,
-		iovecs: []syscall.Iovec{iovec},
+		iovecs: []unix.Iovec{iovec},
 	}
 	return buff
 }
@@ -29,13 +29,13 @@ func createBuffers(bufferSize uint, maxConn uint) []*buffer {
 	for index := range buffs {
 		startIndex := index * int(bufferSize)
 		buff := bufferMem[startIndex : startIndex+int(bufferSize)]
-		iovec := syscall.Iovec{
+		iovec := unix.Iovec{
 			Base: &buff[0],
 			Len:  uint64(bufferSize),
 		}
 		buffs[index] = &buffer{
 			data:   buff,
-			iovecs: []syscall.Iovec{iovec},
+			iovecs: []unix.Iovec{iovec},
 		}
 	}
 	return buffs

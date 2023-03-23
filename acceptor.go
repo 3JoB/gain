@@ -1,7 +1,7 @@
 package gain
 
 import (
-	"github.com/pawelgaczynski/gain/iouring"
+	"github.com/3JoB/gain/iouring"
 )
 
 type acceptor struct {

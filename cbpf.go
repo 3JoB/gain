@@ -1,7 +1,6 @@
 package gain
 
 import (
-	"syscall"
 	"unsafe"
 
 	"golang.org/x/net/bpf"
@@ -24,8 +23,8 @@ func (f filter) applyTo(fd int) error {
 		Filter: (*unix.SockFilter)(unsafe.Pointer(&assembled[0])),
 	}
 	var b = (*[unix.SizeofSockFprog]byte)(unsafe.Pointer(&program))[:unix.SizeofSockFprog]
-	if _, _, errno := syscall.Syscall6(syscall.SYS_SETSOCKOPT,
-		uintptr(fd), uintptr(syscall.SOL_SOCKET), uintptr(unix.SO_ATTACH_REUSEPORT_CBPF),
+	if _, _, errno := unix.Syscall6(unix.SYS_SETSOCKOPT,
+		uintptr(fd), uintptr(unix.SOL_SOCKET), uintptr(unix.SO_ATTACH_REUSEPORT_CBPF),
 		uintptr(unsafe.Pointer(&b[0])), uintptr(len(b)), 0); errno != 0 {
 		return errno
 	}

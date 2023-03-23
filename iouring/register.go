@@ -4,8 +4,9 @@ import (
 	"errors"
 	"os"
 	"runtime"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -101,7 +102,7 @@ func (ring *Ring) RegisterProbe() (*Probe, error) {
 	return probe, err
 }
 
-func (ring *Ring) RegisterBuffers(iovecs []syscall.Iovec) (uintptr, uintptr, error) {
+func (ring *Ring) RegisterBuffers(iovecs []unix.Iovec) (uintptr, uintptr, error) {
 	return ring.Register(RegisterBuffers, unsafe.Pointer(&iovecs[0]), len(iovecs))
 }
 
@@ -114,15 +115,15 @@ func (ring *Ring) RegisterIOWQMaxWorkers(args []uint) (uintptr, uintptr, error) 
 }
 
 func increaseRlimitNofile(nr uint64) error {
-	rlim := &syscall.Rlimit{}
-	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, rlim)
+	rlim := &unix.Rlimit{}
+	err := unix.Getrlimit(unix.RLIMIT_NOFILE, rlim)
 	if err != nil {
 		return err
 	}
 
 	if rlim.Cur < nr {
 		rlim.Cur += nr
-		_ = syscall.Setrlimit(syscall.RLIMIT_NOFILE, rlim)
+		_ = unix.Setrlimit(unix.RLIMIT_NOFILE, rlim)
 	}
 
 	return nil
@@ -137,7 +138,7 @@ func (ring *Ring) RegisterFiles(files unsafe.Pointer, nrFiles int) (uintptr, err
 		if err == nil {
 			break
 		}
-		if errors.Is(err, syscall.EMFILE) && !didIncrease {
+		if errors.Is(err, unix.EMFILE) && !didIncrease {
 			didIncrease = true
 			_ = increaseRlimitNofile(uint64(nrFiles))
 			continue
@@ -164,7 +165,7 @@ func (ring *Ring) RegisterFilesSparse(nr uint32) (uintptr, error) {
 		if err == nil {
 			break
 		}
-		if errors.Is(err, syscall.EMFILE) && !didIncrease {
+		if errors.Is(err, unix.EMFILE) && !didIncrease {
 			didIncrease = true
 			_ = increaseRlimitNofile(uint64(nr))
 			continue
@@ -209,7 +210,7 @@ func (ring *Ring) UnregisterRingFd() (uintptr, error) {
 }
 
 func (ring *Ring) Register(op uint, arg unsafe.Pointer, nrArgs int) (uintptr, uintptr, error) {
-	returnFirst, returnSecond, errno := syscall.Syscall6(
+	returnFirst, returnSecond, errno := unix.Syscall6(
 		sysRegister,
 		uintptr(ring.fd),
 		uintptr(op),

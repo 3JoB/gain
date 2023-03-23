@@ -4,8 +4,9 @@ import (
 	"fmt"
 
 	"github.com/alitto/pond"
-	"github.com/pawelgaczynski/gain/iouring"
 	"github.com/rs/zerolog"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 type readWriteWorker interface {
@@ -40,10 +41,7 @@ func (w *readWriteWorkerImpl) handleAsyncWritesIfEnabled() {
 }
 
 func (w *readWriteWorkerImpl) handleAsyncWrites() {
-	for {
-		if w.writeQueue.isEmpty() {
-			break
-		}
+	for !w.writeQueue.isEmpty() {
 		conn := w.writeQueue.dequeue()
 		_, err := w.addWriteRequest(conn)
 		if err != nil {

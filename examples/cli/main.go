@@ -11,10 +11,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/pawelgaczynski/gain"
-	"github.com/pawelgaczynski/gain/logger"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
+
+	"github.com/3JoB/gain"
+	"github.com/3JoB/gain/logger"
 )
 
 const (

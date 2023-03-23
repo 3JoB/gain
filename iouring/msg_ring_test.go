@@ -3,8 +3,9 @@ package iouring_test
 import (
 	"testing"
 
-	"github.com/pawelgaczynski/gain/iouring"
 	. "github.com/stretchr/testify/require"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 func TestMsgRingItself(t *testing.T) {

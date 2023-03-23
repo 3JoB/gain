@@ -3,8 +3,9 @@ package iouring
 import (
 	"fmt"
 	"log"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 // Magic offsets for the application to mmap the data it needs.
@@ -28,12 +29,12 @@ func (ring *Ring) mmap(fileDescriptor int) error {
 		}
 		ring.cqRing.ringSize = ring.sqRing.ringSize
 	}
-	data, err := syscall.Mmap(
+	data, err := unix.Mmap(
 		fileDescriptor,
 		int64(offsqRing),
 		int(ring.sqRing.ringSize),
-		syscall.PROT_READ|syscall.PROT_WRITE,
-		syscall.MAP_SHARED|syscall.MAP_POPULATE,
+		unix.PROT_READ|unix.PROT_WRITE,
+		unix.MAP_SHARED|unix.MAP_POPULATE,
 	)
 	if err != nil {
 		return err
@@ -42,9 +43,9 @@ func (ring *Ring) mmap(fileDescriptor int) error {
 	if ring.params.features&FeatSingleMMap > 0 {
 		ring.cqRing.buffer = ring.sqRing.buffer
 	} else {
-		data, err = syscall.Mmap(
-			fileDescriptor, int64(offcqRing), int(ring.cqRing.ringSize), syscall.PROT_READ|syscall.PROT_WRITE,
-			syscall.MAP_SHARED|syscall.MAP_POPULATE)
+		data, err = unix.Mmap(
+			fileDescriptor, int64(offcqRing), int(ring.cqRing.ringSize), unix.PROT_READ|unix.PROT_WRITE,
+			unix.MAP_SHARED|unix.MAP_POPULATE)
 		if err != nil {
 			unmapErr := ring.UnmapRings()
 			if unmapErr != nil {
@@ -69,12 +70,12 @@ func (ring *Ring) mmap(fileDescriptor int) error {
 	)
 	ring.sqRing.array = (*uint32)(unsafe.Pointer(uintptr(unsafe.Pointer(ringStart)) + uintptr(ring.params.sqOff.array)))
 	sz := uintptr(ring.params.sqEntries) * unsafe.Sizeof(SubmissionQueueEntry{})
-	buff, err := syscall.Mmap(
+	buff, err := unix.Mmap(
 		fileDescriptor,
 		int64(offSQEs),
 		int(sz),
-		syscall.PROT_READ|syscall.PROT_WRITE,
-		syscall.MAP_SHARED|syscall.MAP_POPULATE,
+		unix.PROT_READ|unix.PROT_WRITE,
+		unix.MAP_SHARED|unix.MAP_POPULATE,
 	)
 	if err != nil {
 		unmapErr := ring.UnmapRings()
@@ -107,14 +108,14 @@ func (ring *Ring) mmap(fileDescriptor int) error {
 }
 
 func (ring *Ring) munmap() error {
-	return syscall.Munmap(ring.sqRing.sqeBuffer)
+	return unix.Munmap(ring.sqRing.sqeBuffer)
 }
 
 func (ring *Ring) UnmapRings() error {
 	var firstErr, secondErr error
-	firstErr = syscall.Munmap(ring.sqRing.buffer)
+	firstErr = unix.Munmap(ring.sqRing.buffer)
 	if ring.cqRing.buffer != nil && &ring.cqRing.buffer[0] != &ring.sqRing.buffer[0] {
-		secondErr = syscall.Munmap(ring.cqRing.buffer)
+		secondErr = unix.Munmap(ring.cqRing.buffer)
 	}
 	if firstErr != nil || secondErr != nil {
 		return fmt.Errorf("unmap first error: %s, second error: %s", firstErr.Error(), secondErr.Error()) // nolint: errorlint

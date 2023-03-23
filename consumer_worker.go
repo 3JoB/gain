@@ -1,12 +1,13 @@
 package gain
 
 import (
-	"fmt"
-	"syscall"
+	"errors"
 
-	"github.com/pawelgaczynski/gain/iouring"
-	"github.com/pawelgaczynski/gain/logger"
 	"go.uber.org/multierr"
+	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
+	"github.com/3JoB/gain/logger"
 )
 
 type consumerConfig struct {
@@ -28,7 +29,7 @@ type consumerWorker struct {
 
 func (c *consumerWorker) addConnToQueue(fd int) error {
 	if c.connQueue == nil {
-		return fmt.Errorf("Conn queue is nil")
+		return errors.New("Conn queue is nil")
 	}
 	c.connQueue.enqueue(fd)
 	return nil
@@ -77,7 +78,7 @@ func (c *consumerWorker) handleConn(conn *connection, cqe *iouring.CompletionQue
 			}
 		}
 	default:
-		err = fmt.Errorf("unknown connection state")
+		err = errors.New("unknown connection state")
 	}
 	if err != nil {
 		shutdownErr := c.syscallShutdownSocket(conn.fd)
@@ -89,10 +90,7 @@ func (c *consumerWorker) handleConn(conn *connection, cqe *iouring.CompletionQue
 }
 
 func (c *consumerWorker) getConnsFromQueue() {
-	for {
-		if c.connQueue.isEmpty() {
-			break
-		}
+	for !c.connQueue.isEmpty() {
 		fd := c.connQueue.dequeue()
 		conn, err := c.connectionPool.get(fd)
 		if err != nil {
@@ -166,7 +164,7 @@ func (c *consumerWorker) loop(socket int) error {
 			return nil
 		}
 		fileDescriptor := int(cqe.UserData() & ^allFlagsMask)
-		if fileDescriptor < syscall.Stderr {
+		if fileDescriptor < unix.Stderr {
 			c.logError(nil).Int("fd", fileDescriptor).Msg("Invalid file descriptor")
 			return nil
 		}

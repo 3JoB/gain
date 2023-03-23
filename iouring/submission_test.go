@@ -2,12 +2,13 @@ package iouring_test
 
 import (
 	"runtime"
-	"syscall"
 	"testing"
 	"time"
 
-	"github.com/pawelgaczynski/gain/iouring"
 	. "github.com/stretchr/testify/require"
+	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 func TestSubmitAndWait(t *testing.T) {
@@ -22,7 +23,7 @@ func TestSubmitAndWait(t *testing.T) {
 
 	NoError(t, queueNOPs(t, ring, 4, 0))
 
-	timespec := syscall.NsecToTimespec((time.Millisecond * 100).Nanoseconds())
+	timespec := unix.NsecToTimespec((time.Millisecond * 100).Nanoseconds())
 	_, err = ring.SubmitAndWaitTimeout(10, &timespec)
 	runtime.KeepAlive(timespec)
 

@@ -3,14 +3,14 @@ package iouring_test
 import (
 	"fmt"
 	"net"
-	"syscall"
 	"testing"
 	"time"
 	"unsafe"
 
-	"github.com/pawelgaczynski/gain/iouring"
 	. "github.com/stretchr/testify/require"
 	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 func TestAccept(t *testing.T) {
@@ -18,20 +18,20 @@ func TestAccept(t *testing.T) {
 	Nil(t, err)
 	defer ring.Close()
 
-	socketFd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_STREAM, 0)
+	socketFd, err := unix.Socket(unix.AF_INET, unix.SOCK_STREAM, 0)
 	Nil(t, err)
-	err = syscall.SetsockoptInt(socketFd, syscall.SOL_SOCKET, syscall.SO_REUSEADDR, 1)
+	err = unix.SetsockoptInt(socketFd, unix.SOL_SOCKET, unix.SO_REUSEADDR, 1)
 	Nil(t, err)
-	err = syscall.Bind(socketFd, &syscall.SockaddrInet4{
+	err = unix.Bind(socketFd, &unix.SockaddrInet4{
 		Port: testPort,
 	})
 	Nil(t, err)
-	err = syscall.SetNonblock(socketFd, false)
+	err = unix.SetNonblock(socketFd, false)
 	Nil(t, err)
-	err = syscall.Listen(socketFd, 1)
+	err = unix.Listen(socketFd, 1)
 	Nil(t, err)
 	defer func() {
-		err := syscall.Close(socketFd)
+		err := unix.Close(socketFd)
 		Nil(t, err)
 	}()
 
@@ -69,7 +69,7 @@ func TestAccept(t *testing.T) {
 			cqe := cqes[i]
 			Equal(t, uint64(socketFd), cqe.UserData())
 			Greater(t, cqe.Res(), int32(0))
-			err = syscall.Shutdown(int(cqe.Res()), syscall.SHUT_RDWR)
+			err = unix.Shutdown(int(cqe.Res()), unix.SHUT_RDWR)
 			Nil(t, err)
 		}
 		if n > 0 {

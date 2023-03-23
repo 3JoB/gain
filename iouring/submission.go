@@ -1,11 +1,13 @@
 package iouring
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"sync/atomic"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 const FileIndexAlloc uint = 4294967295
@@ -158,7 +160,7 @@ func (ring *Ring) Submit() (uint, error) {
 	return ring.SubmitAndWaitInternal(0)
 }
 
-func (ring *Ring) SubmitAndWaitTimeout(waitNr uint32, timeSpec *syscall.Timespec) (*CompletionQueueEvent, error) {
+func (ring *Ring) SubmitAndWaitTimeout(waitNr uint32, timeSpec *unix.Timespec) (*CompletionQueueEvent, error) {
 	var toSubmit uint32
 	if timeSpec != nil {
 		if ring.features&FeatExtArg > 0 {
@@ -183,7 +185,7 @@ func (ring *Ring) SubmitAndWaitTimeout(waitNr uint32, timeSpec *syscall.Timespec
 			return cqe, err
 		}
 		// FIXME
-		return nil, fmt.Errorf("unsupported")
+		return nil, errors.New("unsupported")
 	}
 	toSubmit = ring.FlushSQ()
 	getData := &getData{

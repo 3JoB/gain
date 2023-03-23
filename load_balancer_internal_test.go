@@ -16,8 +16,7 @@ func (w *testWorker) activeConnections() int {
 	return w.conns
 }
 
-func (w *testWorker) setIndex(index int) {
-}
+func (w *testWorker) setIndex(index int) {}
 
 func (w *testWorker) index() int {
 	return 0
@@ -28,8 +27,7 @@ func (w *testWorker) loop(socket int) error {
 	return nil
 }
 
-func (w *testWorker) shutdown() {
-}
+func (w *testWorker) shutdown() {}
 
 func (w *testWorker) addConnToQueue(fd int) error {
 	return nil

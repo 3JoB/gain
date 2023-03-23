@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pawelgaczynski/gain"
 	"github.com/rs/zerolog"
 	. "github.com/stretchr/testify/require"
+
+	"github.com/3JoB/gain"
 )
 
 const testPort = 9876
@@ -36,7 +37,9 @@ func (h *TestServerHandler) OnOpen(fd int) {
 		h.onOpenCallback(fd)
 	}
 }
+
 func (h *TestServerHandler) OnClose(fd int) {}
+
 func (h *TestServerHandler) OnData(c gain.Conn) error {
 	buffer := make([]byte, 128)
 	_, err := c.Read(buffer)

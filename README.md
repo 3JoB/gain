@@ -4,7 +4,7 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/pawelgaczynski/gain">
+  <a href="https://github.com/3JoB/gain">
     <img src="images/gain.png" alt="Logo" width="495" height="327">
   </a>
 
@@ -14,9 +14,9 @@
     Gain is a high-performance io_uring networking framework written entirely in Go.
     <br />
     <br />
-    <a href="https://github.com/pawelgaczynski/gain/issues">Report Bug</a>
+    <a href="https://github.com/3JoB/gain/issues">Report Bug</a>
     ·
-    <a href="https://github.com/pawelgaczynski/gain/issues">Request Feature</a>
+    <a href="https://github.com/3JoB/gain/issues">Request Feature</a>
   </p>
 </div>
 
@@ -61,7 +61,7 @@ Articles about the project:
 ## Getting Started
 
 
-**See an example: [CLI server example](https://github.com/pawelgaczynski/gain/blob/main/examples/cli/main.go)**
+**See an example: [CLI server example](https://github.com/3JoB/gain/blob/main/examples/cli/main.go)**
 
 <br/>
 
@@ -75,7 +75,7 @@ Gain requires Go 1.18+
 
 1. Install the framework
    ```sh
-   go get -u github.com/pawelgaczynski/gain@v0.1.0-alpha
+   go get -u github.com/3JoB/gain@v0.1.0-alpha
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -101,7 +101,7 @@ Gain requires Go 1.18+
 - [x] Support for kernels older than 5.15
 - [ ] Support for Windows - IoRing ([documentation](https://learn.microsoft.com/en-us/windows/win32/api/ioringapi/))
 
-See the [open issues](https://github.com/pawelgaczynski/gain/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/3JoB/gain/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -127,7 +127,7 @@ Benchmark type: [see TechEmpower Plaintext](https://github.com/TechEmpower/Frame
 <br/>
 
 <br/>
-<a href="https://github.com/pawelgaczynski/gain">
+<a href="https://github.com/3JoB/gain">
   <img src="images/benchmark_result.png" alt="Logo" width="710" height="454">
 </a>
 <br/>
@@ -180,7 +180,7 @@ Distributed under the Apache 2.0 License. See `LICENSE` for more information.
 
 Paweł Gaczyński - [LinkedIn](http://linkedin.com/in/pawel-gaczynski)
 
-Project Link: [https://github.com/pawelgaczynski/gain](https://github.com/pawelgaczynski/gain)
+Project Link: [https://github.com/3JoB/gain](https://github.com/3JoB/gain)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -203,4 +203,4 @@ Use this space to list resources you find helpful and would like to give credit 
 
 
 [license-shield]: https://img.shields.io/badge/License-Apache_2.0-blue.svg
-[license-url]: https://github.com/pawelgaczynski/gain/blob/main/LICENSE
+[license-url]: https://github.com/3JoB/gain/blob/main/LICENSE

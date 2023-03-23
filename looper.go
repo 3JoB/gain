@@ -4,7 +4,7 @@ import (
 	"errors"
 	"runtime"
 
-	"github.com/pawelgaczynski/gain/iouring"
+	"github.com/3JoB/gain/iouring"
 )
 
 type eventProcessor func(*iouring.CompletionQueueEvent) error

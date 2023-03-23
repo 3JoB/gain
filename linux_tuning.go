@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"syscall"
 
 	"golang.org/x/sys/unix"
 )
 
 func setProcessPriority() error {
 	pid := os.Getpid()
-	return syscall.Setpriority(syscall.PRIO_PROCESS, pid, -19)
+	return unix.Setpriority(unix.PRIO_PROCESS, pid, -19)
 }
 
 func setAffinity(index int) error {

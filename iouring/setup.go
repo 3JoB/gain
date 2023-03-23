@@ -2,8 +2,9 @@ package iouring
 
 import (
 	"os"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -47,8 +48,10 @@ type SQRingOffsets struct {
 	flags       uint32
 	dropped     uint32
 	array       uint32
+
 	// nolint: unused
 	resv1 uint32
+
 	// nolint: unused
 	resv2 uint64
 }
@@ -61,8 +64,10 @@ type CQRingOffsets struct {
 	overflow    uint32
 	cqes        uint32
 	flags       uint32
+
 	// nolint: unused
 	resv1 uint32
+
 	// nolint: unused
 	resv2 uint64
 }
@@ -82,7 +87,7 @@ type Params struct {
 }
 
 func (ring *Ring) QueueInitParams(entries uint) error {
-	fd, _, errno := syscall.Syscall(sysSetup, uintptr(entries), uintptr(unsafe.Pointer(ring.params)), 0)
+	fd, _, errno := unix.Syscall(sysSetup, uintptr(entries), uintptr(unsafe.Pointer(ring.params)), 0)
 	fileDescriptor := int(fd)
 	if errno != 0 {
 		return os.NewSyscallError("io_uring_setup", errno)
@@ -105,7 +110,7 @@ func (ring *Ring) QueueInit(entries uint, flags uint32) error {
 
 func (ring *Ring) Close() error {
 	if ring.fd != 0 {
-		return syscall.Close(ring.fd)
+		return unix.Close(ring.fd)
 	}
 	return nil
 }

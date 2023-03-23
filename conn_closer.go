@@ -1,10 +1,10 @@
 package gain
 
 import (
-	"syscall"
-
-	"github.com/pawelgaczynski/gain/iouring"
 	"github.com/rs/zerolog"
+	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 type connCloser struct {
@@ -32,7 +32,7 @@ func (c *connCloser) addCloseConnRequest(conn *connection) (*iouring.SubmissionQ
 }
 
 func (c *connCloser) syscallShutdownSocket(fileDescriptor int) error {
-	return syscall.Shutdown(fileDescriptor, syscall.SHUT_RDWR)
+	return unix.Shutdown(fileDescriptor, unix.SHUT_RDWR)
 }
 
 func newConnCloser(ring *iouring.Ring, logger zerolog.Logger) *connCloser {

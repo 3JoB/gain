@@ -1,11 +1,10 @@
 package gain
 
 import (
-	"syscall"
-
-	"github.com/pawelgaczynski/gain/iouring"
 	"github.com/rs/zerolog"
 	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 type startSignal int
@@ -62,7 +61,7 @@ func (w *workerImpl) processEvent(cqe *iouring.CompletionQueueEvent) bool {
 	switch {
 	case cqe.Res() < 0:
 		w.logError(nil).
-			Str("error", unix.ErrnoName(-syscall.Errno(cqe.Res()))).
+			Str("error", unix.ErrnoName(-unix.Errno(cqe.Res()))).
 			Str("req flag", flagToString(cqe.UserData())).
 			Uint64("req fd", cqe.UserData() & ^allFlagsMask).
 			Uint64("user data", cqe.UserData()).

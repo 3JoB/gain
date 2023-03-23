@@ -3,9 +3,10 @@ package iouring_test
 import (
 	"testing"
 
-	"github.com/pawelgaczynski/gain/iouring"
 	"github.com/stretchr/testify/assert"
 	. "github.com/stretchr/testify/require"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 func queueNOPs(t *testing.T, ring *iouring.Ring, number int, offset int) error {

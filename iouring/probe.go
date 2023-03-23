@@ -14,6 +14,7 @@ type (
 		Res2   [3]uint32
 		Ops    [probeOpsSize]probeOp
 	}
+
 	probeOp struct {
 		Op    uint8
 		Res   uint8

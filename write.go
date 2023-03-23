@@ -3,7 +3,7 @@ package gain
 import (
 	"unsafe"
 
-	"github.com/pawelgaczynski/gain/iouring"
+	"github.com/3JoB/gain/iouring"
 )
 
 type writer struct {

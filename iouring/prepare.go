@@ -2,9 +2,10 @@ package iouring
 
 import (
 	"log"
-	"syscall"
 	"time"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 func (entry *SubmissionQueueEntry) setTargetFixedFile(fileIndex uint) {
@@ -137,19 +138,19 @@ func (entry *SubmissionQueueEntry) PrepareNop() {
 }
 
 func (entry *SubmissionQueueEntry) PrepareTimeout(duration time.Duration, count uint64, flags uint32) {
-	spec := syscall.NsecToTimespec(duration.Nanoseconds())
+	spec := unix.NsecToTimespec(duration.Nanoseconds())
 	entry.prepareRW(OpTimeout, -1, uintptr(unsafe.Pointer(&spec)), 1, count)
 	entry.OpcodeFlags = flags
 }
 
 func (entry *SubmissionQueueEntry) PrepareTimeoutRemove(duration time.Duration, count uint64, flags uint32) {
-	spec := syscall.NsecToTimespec(duration.Nanoseconds())
+	spec := unix.NsecToTimespec(duration.Nanoseconds())
 	entry.prepareRW(OpTimeoutRemove, -1, uintptr(unsafe.Pointer(&spec)), 1, count)
 	entry.OpcodeFlags = flags
 }
 
 func (entry *SubmissionQueueEntry) PrepareTimeoutUpdate(duration time.Duration, count uint64, flags uint32) {
-	spec := syscall.NsecToTimespec(duration.Nanoseconds())
+	spec := unix.NsecToTimespec(duration.Nanoseconds())
 	entry.prepareRW(OpTimeoutRemove, -1, uintptr(unsafe.Pointer(&spec)), 1, count)
 	entry.OpcodeFlags = flags | TimeoutUpdate
 }
@@ -170,7 +171,7 @@ func (entry *SubmissionQueueEntry) PrepareCancel(userData uint64, flags int) {
 	log.Fatal(errNotImplemented)
 }
 
-func (entry *SubmissionQueueEntry) PrepareLinkTimeout(ts *syscall.Timespec, flags uint) {
+func (entry *SubmissionQueueEntry) PrepareLinkTimeout(ts *unix.Timespec, flags uint) {
 	// TODO
 	log.Fatal(errNotImplemented)
 }
@@ -451,17 +452,17 @@ func (entry *SubmissionQueueEntry) PrepareSocketDirectAlloc() {
 	log.Fatal(errNotImplemented)
 }
 
-func (entry *SubmissionQueueEntry) PrepareTimeout2(ts *syscall.Timespec, count uint64, flags uint32) {
+func (entry *SubmissionQueueEntry) PrepareTimeout2(ts *unix.Timespec, count uint64, flags uint32) {
 	entry.prepareRW(OpTimeout, -1, uintptr(unsafe.Pointer(ts)), 1, count)
 	entry.OpcodeFlags = flags
 }
 
-func (entry *SubmissionQueueEntry) PrepareUpdateTimeout2(ts *syscall.Timespec, count uint64, flags uint32) {
+func (entry *SubmissionQueueEntry) PrepareUpdateTimeout2(ts *unix.Timespec, count uint64, flags uint32) {
 	entry.prepareRW(OpTimeoutRemove, -1, uintptr(unsafe.Pointer(ts)), 1, count)
 	entry.OpcodeFlags = flags | TimeoutUpdate
 }
 
-func (entry *SubmissionQueueEntry) PrepareRemoveTimeout2(ts *syscall.Timespec, count uint64, flags uint32) {
+func (entry *SubmissionQueueEntry) PrepareRemoveTimeout2(ts *unix.Timespec, count uint64, flags uint32) {
 	entry.prepareRW(OpTimeoutRemove, -1, uintptr(unsafe.Pointer(ts)), 1, count)
 	entry.OpcodeFlags = flags
 }

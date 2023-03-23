@@ -2,15 +2,16 @@ package gain
 
 import (
 	"errors"
-	"syscall"
 	"time"
 
-	"github.com/pawelgaczynski/gain/iouring"
+	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 type singleSubmitter struct {
 	ring            *iouring.Ring
-	timeoutTimeSpec syscall.Timespec
+	timeoutTimeSpec unix.Timespec
 }
 
 func (s *singleSubmitter) submit() error {
@@ -29,6 +30,6 @@ func (s *singleSubmitter) advance(n uint32) {
 func newSingleSubmitter(ring *iouring.Ring) *singleSubmitter {
 	return &singleSubmitter{
 		ring:            ring,
-		timeoutTimeSpec: syscall.NsecToTimespec((time.Millisecond).Nanoseconds()),
+		timeoutTimeSpec: unix.NsecToTimespec((time.Millisecond).Nanoseconds()),
 	}
 }

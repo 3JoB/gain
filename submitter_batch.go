@@ -2,10 +2,11 @@ package gain
 
 import (
 	"errors"
-	"syscall"
 	"time"
 
-	"github.com/pawelgaczynski/gain/iouring"
+	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
 )
 
 var waitForArray = []uint32{
@@ -32,7 +33,7 @@ var waitForArray = []uint32{
 
 type batchSubmitter struct {
 	ring            *iouring.Ring
-	timeoutTimeSpec syscall.Timespec
+	timeoutTimeSpec unix.Timespec
 	waitForIndex    uint32
 	waitFor         uint32
 }
@@ -66,7 +67,7 @@ func (s *batchSubmitter) advance(n uint32) {
 func newBatchSubmitter(ring *iouring.Ring) *batchSubmitter {
 	s := &batchSubmitter{
 		ring:            ring,
-		timeoutTimeSpec: syscall.NsecToTimespec((time.Millisecond).Nanoseconds()),
+		timeoutTimeSpec: unix.NsecToTimespec((time.Millisecond).Nanoseconds()),
 	}
 	s.waitFor = waitForArray[s.waitForIndex]
 	return s

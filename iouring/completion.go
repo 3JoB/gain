@@ -5,8 +5,9 @@ import (
 	"runtime"
 	"strings"
 	"sync/atomic"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 	CQEFSockNonempty
 	CQEFNotif
 )
+
 const CQEBufferShift uint32 = 16
 
 const CQEventFdDisabled uint32 = 1 << 0
@@ -64,9 +66,11 @@ type getData struct {
 type getEventsArg struct {
 	sigMask   uintptr
 	sigMaskSz uint32
+
 	// nolint: structcheck //
 	pad uint32
-	ts  uintptr
+
+	ts uintptr
 }
 
 func (ring *Ring) peekBatchCQEInternal(cqes []*CompletionQueueEvent) int {
@@ -216,7 +220,7 @@ func (ring *Ring) peekCQE() (uint32, *CompletionQueueEvent, error) {
 		)
 		if !(ring.params.features&FeatExtArg != 0) && event.UserData() == math.MaxUint64 {
 			if event.Res() < 0 {
-				err = syscall.Errno(uintptr(-event.Res()))
+				err = unix.Errno(uintptr(-event.Res()))
 			}
 			ring.CQAdvance(1)
 			if err == nil {

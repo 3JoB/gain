@@ -1,6 +1,7 @@
 package gain
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -22,14 +23,14 @@ func (c *connectionPool) get(fileDescriptor int) (*connection, error) {
 
 	if c.prefill {
 		if c.queue.isEmpty() {
-			return nil, fmt.Errorf("connections queue is empty")
+			return nil, errors.New("connections queue is empty")
 		}
 		conn = c.queue.dequeue()
 		conn.fd = fileDescriptor
 		c.connections[fileDescriptor] = conn
 	} else {
 		if len(c.connections) >= c.maxConn {
-			return nil, fmt.Errorf("max connections exceeded")
+			return nil, errors.New("max connections exceeded")
 		}
 		if c.queue.isEmpty() {
 			buffer := createBuffer(c.bufferSize)

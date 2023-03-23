@@ -1,20 +1,19 @@
 package gain
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"sync"
 	"sync/atomic"
-	"syscall"
 
 	"github.com/rs/zerolog"
 	"golang.org/x/sys/unix"
 
-	"github.com/pawelgaczynski/gain/iouring"
-	"github.com/pawelgaczynski/gain/logger"
+	"github.com/3JoB/gain/iouring"
+	"github.com/3JoB/gain/logger"
 )
 
 type Server struct {
@@ -230,22 +229,22 @@ func (s *Server) setupSocket() (int, error) {
 	var ipAddr [4]byte
 	defer func() {
 		if err != nil {
-			_ = syscall.Shutdown(socketFd, syscall.SHUT_RDWR)
+			_ = unix.Shutdown(socketFd, unix.SHUT_RDWR)
 		}
 	}()
-	socketFd, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_STREAM|unix.SOCK_CLOEXEC, 0)
+	socketFd, err = unix.Socket(unix.AF_INET, unix.SOCK_STREAM|unix.SOCK_CLOEXEC, 0)
 	if err != nil {
-		return -1, fmt.Errorf("could not open socket")
+		return -1, errors.New("could not open socket")
 	}
 	netAddr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:80")
 	if err != nil {
-		return -1, fmt.Errorf("could not open socket")
+		return -1, errors.New("could not open socket")
 	}
 	copy(ipAddr[:], netAddr.IP)
 	if err != nil {
 		return -1, err
 	}
-	err = syscall.SetsockoptInt(socketFd, syscall.SOL_SOCKET, syscall.SO_REUSEADDR, 1)
+	err = unix.SetsockoptInt(socketFd, unix.SOL_SOCKET, unix.SO_REUSEADDR, 1)
 	if err != nil {
 		return -1, err
 	}
@@ -273,15 +272,15 @@ func (s *Server) setupSocket() (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	sa := &syscall.SockaddrInet4{
+	sa := &unix.SockaddrInet4{
 		Port: s.config.port,
 		Addr: ipAddr,
 	}
-	err = syscall.Bind(socketFd, sa)
+	err = unix.Bind(socketFd, sa)
 	if err != nil {
 		return -1, err
 	}
-	err = syscall.Listen(socketFd, int(s.config.maxConn))
+	err = unix.Listen(socketFd, int(s.config.maxConn))
 	if err != nil {
 		return -1, err
 	}
@@ -303,7 +302,7 @@ func (s *Server) start(mainProcess bool) error {
 	}
 	if mainProcess {
 		sigs := make(chan os.Signal, 1)
-		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+		signal.Notify(sigs, unix.SIGINT, unix.SIGTERM)
 		go func() {
 			<-sigs
 			s.closeChan <- system

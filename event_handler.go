@@ -9,7 +9,10 @@ type EventHandler interface {
 
 type DefaultEventHandler struct{}
 
-func (e DefaultEventHandler) OnOpen(fd int)     {}
-func (e DefaultEventHandler) OnClose(fd int)    {}
-func (e DefaultEventHandler) OnData(c Conn)     {}
+func (e DefaultEventHandler) OnOpen(fd int) {}
+
+func (e DefaultEventHandler) OnClose(fd int) {}
+
+func (e DefaultEventHandler) OnData(c Conn) {}
+
 func (e DefaultEventHandler) AfterWrite(c Conn) {}

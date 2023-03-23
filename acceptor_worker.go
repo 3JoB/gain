@@ -1,8 +1,8 @@
 package gain
 
 import (
-	"github.com/pawelgaczynski/gain/iouring"
-	"github.com/pawelgaczynski/gain/logger"
+	"github.com/3JoB/gain/iouring"
+	"github.com/3JoB/gain/logger"
 )
 
 type acceptorWorkerConfig struct {

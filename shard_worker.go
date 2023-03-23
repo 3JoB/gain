@@ -1,13 +1,14 @@
 package gain
 
 import (
+	"errors"
 	"fmt"
-	"syscall"
 
-	"github.com/pawelgaczynski/gain/iouring"
-	"github.com/pawelgaczynski/gain/logger"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/unix"
+
+	"github.com/3JoB/gain/iouring"
+	"github.com/3JoB/gain/logger"
 )
 
 type shardWorkerConfig struct {
@@ -90,7 +91,7 @@ func (w *shardWorker) handleConn(conn *connection, cqe *iouring.CompletionQueueE
 			}
 		}
 	default:
-		err = fmt.Errorf("unknown connection state")
+		err = errors.New("unknown connection state")
 	}
 	if err != nil {
 		shutdownErr := w.syscallShutdownSocket(conn.fd)
@@ -134,7 +135,7 @@ func (w *shardWorker) loop(socket int) error {
 			return nil
 		}
 		fileDescriptor := int(cqe.UserData() & ^allFlagsMask)
-		if fileDescriptor < syscall.Stderr {
+		if fileDescriptor < unix.Stderr {
 			w.logError(nil).Int("fd", fileDescriptor).Msg("Invalid file descriptor")
 			return nil
 		}

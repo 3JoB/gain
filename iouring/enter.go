@@ -2,8 +2,9 @@ package iouring
 
 import (
 	"os"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -27,9 +28,9 @@ func (ring *Ring) enter2(
 	raw bool,
 ) (uint, error) {
 	var consumed uintptr
-	var errno syscall.Errno
+	var errno unix.Errno
 	if raw {
-		consumed, _, errno = syscall.RawSyscall6(
+		consumed, _, errno = unix.RawSyscall6(
 			sysEnter,
 			uintptr(ring.enterRingFd),
 			uintptr(submitted),
@@ -39,7 +40,7 @@ func (ring *Ring) enter2(
 			uintptr(size),
 		)
 	} else {
-		consumed, _, errno = syscall.Syscall6(
+		consumed, _, errno = unix.Syscall6(
 			sysEnter,
 			uintptr(ring.enterRingFd),
 			uintptr(submitted),
@@ -50,11 +51,11 @@ func (ring *Ring) enter2(
 		)
 	}
 	switch errno {
-	case syscall.ETIME:
+	case unix.ETIME:
 		return 0, ErrTimerExpired
-	case syscall.EINTR:
+	case unix.EINTR:
 		return 0, ErrInterrupredSyscall
-	case syscall.EAGAIN:
+	case unix.EAGAIN:
 		return 0, ErrAgain
 	default:
 		if errno != 0 {
